@@ -55,7 +55,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
+	// 服务关闭时，手动调用zap.Logger.Sync方法将缓冲区的日志追加到文件中
 	defer func() {
 		_ = accessLogger.Sync()
 		_ = cronLogger.Sync()
@@ -82,9 +82,11 @@ func main() {
 	shutdown.NewHook().Close(
 		// 关闭 http server
 		func() {
+			// 设置 10 秒超时时间的ctx
 			ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 			defer cancel()
 
+			// TODO 后面的一系列关闭操作是否可以使用 server.RegisterOnShutdown() 来实现,RegisterOnShutdown注册的方法会在shutdown的最后执行
 			if err := server.Shutdown(ctx); err != nil {
 				accessLogger.Error("server shutdown err", zap.Error(err))
 			}
