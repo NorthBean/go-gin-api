@@ -14,6 +14,7 @@ var (
 	pro    Environment = &environment{value: "pro"}
 )
 
+// 确保environment实现了Environment接口
 var _ Environment = (*environment)(nil)
 
 // Environment 环境配置
@@ -23,7 +24,7 @@ type Environment interface {
 	IsFat() bool
 	IsUat() bool
 	IsPro() bool
-	t()
+	t() // 保证只有该包可以实现该接口
 }
 
 type environment struct {
@@ -52,6 +53,7 @@ func (e *environment) IsPro() bool {
 
 func (e *environment) t() {}
 
+// 初始化时通过命令行参数指定运行环境，默认是fat
 func init() {
 	env := flag.String("env", "", "请输入运行环境:\n dev:开发环境\n fat:测试环境\n uat:预上线环境\n pro:正式环境\n")
 	flag.Parse()

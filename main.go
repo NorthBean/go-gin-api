@@ -35,9 +35,13 @@ import (
 func main() {
 	// 初始化 access logger
 	accessLogger, err := logger.NewJSONLogger(
+		// 禁用控制台输出
 		logger.WithDisableConsole(),
+		// 日志添加domain字段，添加项目名和环境标识
 		logger.WithField("domain", fmt.Sprintf("%s[%s]", configs.ProjectName, env.Active().Value())),
+		// 指定日志输出格式
 		logger.WithTimeLayout(timeutil.CSTLayout),
+		// 日志输出到文件
 		logger.WithFileP(configs.ProjectAccessLogFile),
 	)
 	if err != nil {
