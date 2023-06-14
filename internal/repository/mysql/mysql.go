@@ -40,7 +40,9 @@ type dbRepo struct {
 	DbW *gorm.DB
 }
 
+// New 初始化 mysql
 func New() (Repo, error) {
+	// 获取到mysql的配置信息
 	cfg := configs.Get().MySQL
 	dbr, err := dbConnect(cfg.Read.User, cfg.Read.Pass, cfg.Read.Addr, cfg.Read.Name)
 	if err != nil {
@@ -94,6 +96,7 @@ func dbConnect(user, pass, addr, dbName string) (*gorm.DB, error) {
 		"Local")
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		// 表名策略，使用单数形式
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true,
 		},
@@ -103,7 +106,7 @@ func dbConnect(user, pass, addr, dbName string) (*gorm.DB, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, fmt.Sprintf("[db connection failed] Database name: %s", dbName))
 	}
-
+	// 设置字符集
 	db.Set("gorm:table_options", "CHARSET=utf8mb4")
 
 	cfg := configs.Get().MySQL.Base
@@ -122,7 +125,7 @@ func dbConnect(user, pass, addr, dbName string) (*gorm.DB, error) {
 	// 设置最大连接超时
 	sqlDB.SetConnMaxLifetime(time.Minute * cfg.ConnMaxLifeTime)
 
-	// 使用插件
+	// 使用插件，在GORM库中注册一个TracePlugin插件，用于记录SQL执行时间和执行情况等信息
 	db.Use(&TracePlugin{})
 
 	return db, nil

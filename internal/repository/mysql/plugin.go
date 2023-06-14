@@ -50,6 +50,7 @@ func before(db *gorm.DB) {
 }
 
 func after(db *gorm.DB) {
+
 	_ctx := db.Statement.Context
 	ctx, ok := _ctx.(core.StdContext)
 	if !ok {

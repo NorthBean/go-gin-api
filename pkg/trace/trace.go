@@ -21,7 +21,7 @@ type T interface {
 	AppendRedis(redis *Redis) *Trace
 }
 
-// Trace 记录的参数
+// Trace 记录的参数，用于追踪调用链路，类似于edge的reqId
 type Trace struct {
 	mux                sync.Mutex
 	Identifier         string    `json:"trace_id"`             // 链路ID
@@ -56,6 +56,7 @@ type Response struct {
 }
 
 func New(id string) *Trace {
+	// 如果id是空，生成随机ID
 	if id == "" {
 		buf := make([]byte, 10)
 		io.ReadFull(rand.Reader, buf)
